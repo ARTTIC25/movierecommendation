@@ -3,18 +3,19 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def recommend(movie_name):
-  if movie_name  not in movies["title_lower"].values:
-    print("movie not found")
+  matching=movies[movies["title_lower"].str.contains(movie_name)]
+  if matching.empty:
+    print("no movie found")
     return
-  movie_index=movies[movies["title_lower"]==movie_name].index[0]
+  movie_index=matching.index[0]
   distance=list(enumerate(similarity[movie_index]))
   distance=sorted(distance,reverse=True,key=lambda x:x[1])
   found=False
-  for movie in distance[1:]:
+  for movie in distance[1:6]:#prints top 5 
   
     if (movie[1]>0):
      found=True
-     print(movies.iloc[movie[0]].title)
+     print(movies.iloc[movie[0]].title,"->",round(movie[1],2)*100,"%")
   if not found:
     print("no similar movies")
 
