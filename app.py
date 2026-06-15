@@ -1,65 +1,97 @@
+from dotenv import load_dotenv
+from difflib import get_close_matches
 import pickle
 import streamlit as st
 import requests
+import os
+
+
+load_dotenv()
+API_KEY=os.getenv("API_KEY")
 
 movies=pickle.load(open("movies.pkl","rb"))
 similarity=pickle.load(open("similarity.pkl","rb"))
 
 def fetch_poster(movie_id):
-   url=f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=6ad1c84f483ea69345147278898318d3&language=en-US"
+   url=f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}&language=en-US"
    data=requests.get(url)
    data=data.json()
    
-   poster_path= data["poster_path"]
-   full_path="https://image.tmdb.org/t/p/w500/"+poster_path
-   return  full_path
+   poster_path= data.get("poster_path")
+   if poster_path:
+    poster_url= ("https://image.tmdb.org/t/p/w500/" + poster_path)
+   else:
+      poster_url= "https://via.placeholder.com/500x750?text=No+Image"
+   rating=data.get("vote_average","N/A")
+   release_date=data.get("release_date","unknown")
+   overview=data.get("overview","no overview available")
+   return (poster_url,rating,release_date,overview)
 
 def recommend(movie):
-  match_movie=movies[movies["title"].str.lower().str.contains(movie)]
+  movie=movie.lower()
+  match_movie=get_close_matches(movie,movies["title"].str.lower().tolist(),n=1,cutoff=0.6)
 
-  if match_movie.empty:
+  if len(match_movie)==0:
     #print("NO such movie found")
-    return [],[]
-  movie_index=match_movie.index[0]
+    return [],[],[]
+  movie_index=movies[movies["title"].str.lower()==match_movie[0]].index[0]
   distance=list(enumerate(similarity[movie_index]))
-  movie_list=sorted(distance,reverse=True,key=lambda x:x[1])[1:6]
+  movie_list=sorted(distance,reverse=True,key=lambda x:x[1])[1:15]
+  orginal_genre=movies.iloc[movie_index].genres
+  similarity_score=[]
   recommended_movie=[]
   recommended_posters=[]
+  recommended_rating=[]
+  recommended_overview=[]
+  recommended_release_date=[]
   #print("\nTop movie recommendation\n")
   
-  for i in movie_list:
-    movie_id=movies.iloc[i[0]].movie_id
-    recommended_movie.append(movies.iloc[i[0]].title)
-    recommended_posters.append(fetch_poster(movie_id))
-  return recommended_movie,recommended_posters
+  for index,movie_data in movie_list:
+    if movie_data < 0.15:
+       continue
+    recommended_genre=movies.iloc[index].genres
+    if len(set(orginal_genre) & set(recommended_genre)) > 0:
+      movie_id=movies.iloc[index].movie_id
+      (poster,rating,release_date,overview)=fetch_poster(movie_id)
+      recommended_movie.append(movies.iloc[index].title)
+      recommended_posters.append(poster)
+      recommended_rating.append(rating)
+      recommended_release_date.append(release_date)
+      recommended_overview.append(overview)
+      similarity_score.append(round(movie_data*100,2))
+      if len(recommended_movie)==5:
+         break
+  return (recommended_movie,recommended_posters,recommended_rating,recommended_overview,recommended_release_date,similarity_score)
 
 
 st.title("Movie Recommendation System")
 
 movie_list=movies["title"].values
-selected_movie=st.selectbox("Select a movie",movie_list)
+selected_movie=st.text_input("Enter a movie")
 
 
 if st.button("Recommend"):
-    name,poster=recommend(selected_movie.lower())
-    col1,col2,col3,col4,col5 =st.columns(5)
-    
-    with col1:
-       st.text(name[0])
-       st.image(poster[0])
 
-    with col2:
-       st.text(name[1])
-       st.image(poster[1])
+    with st.spinner("Finding your recommendation...."):
 
-    with col3:
-       st.text(name[2])
-       st.image(poster[2])
-    
-    with col4:
-       st.text(name[3])
-       st.image(poster[3])
+        (name, poster, rating,overview,date,score) = recommend(selected_movie.lower())
 
-    with col5:
-       st.text(name[4])
-       st.image(poster[4])
+        if len(name) == 0:
+
+            st.warning("No movie found")
+
+        else:
+            col=st.columns(len(name))
+            for i in range(len(name)):
+               with col[i]:
+                  st.image(poster[i])
+                  st.subheader(name[i])
+                  st.caption(f"⭐ {rating[i]}")
+                  st.caption(f"📅 {date[i]}")
+                  st.caption(f"🎯 {score[i]}% Match")
+                  st.write(overview[i][:120] + "...")
+            
+st.caption("Movie provided by TMDB")
+            
+
+            

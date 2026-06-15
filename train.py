@@ -3,7 +3,7 @@ import ast
 import pickle
 
 from nltk.stem.porter import PorterStemmer
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 movies=pd.read_csv("tmdb_5000_movies.csv")
@@ -33,7 +33,7 @@ def convert2(text):
   result=[]
   counter=0
   for i in  ast.literal_eval(text):
-    if counter!=3:
+    if counter!=5:
       result.append(i["name"])
       counter+=1
     else:
@@ -44,7 +44,7 @@ def convert3(text):
   result=[]
   for i in ast.literal_eval(text):
     if i["job"]=="Director":
-      result.append(i["name"])
+      result.extend([i["name"]] * 3)
   return result
 
 def space(text):
@@ -94,16 +94,15 @@ movies["cast"]=movies["cast"].apply(space)
 movies["crew"]=movies["crew"].apply(space)
 #print(movies["crew"].head())
 
-movies["tag"]=movies["overview"]+movies["genres"]+movies["cast"]+movies["crew"]+movies["keywords"]
+movies["tag"]=movies["overview"]+movies["genres"]*3+movies["cast"]*2+movies["crew"]*2+movies["keywords"]*3
 movies["tag"]=movies["tag"].apply(lambda x:" ".join(x))
 #print(movies["tag"].head())
 
 movies["tag"]=movies["tag"].str.lower()
-movies["tag"]=movies["tag"].apply(stem)
 #print(movies["tag"][0])
 
-cv=CountVectorizer(max_features=5000,stop_words="english")
-vectors=cv.fit_transform(movies["tag"]).toarray()
+tfidf=TfidfVectorizer(max_features=5000,stop_words="english")
+vectors=tfidf.fit_transform(movies["tag"]).toarray()
 #print(vectors.shape)
 
 similarity=cosine_similarity(vectors)
