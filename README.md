@@ -1,8 +1,8 @@
-# 🎬 Movie Recommendation System
+# Movie Recommendation System
 
 A content-based movie recommendation system built using Machine Learning, Streamlit, and the TMDB API.
 
-## 🚀 Live Features
+## Live Features
 
 - Movie recommendations based on content similarity
 - Fuzzy movie search support
@@ -13,7 +13,7 @@ A content-based movie recommendation system built using Machine Learning, Stream
 - Responsive Streamlit interface
 - Dark theme UI
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - Python
 - Pandas
@@ -23,7 +23,7 @@ A content-based movie recommendation system built using Machine Learning, Stream
 - Streamlit
 - TMDB API
 
-## 📊 Dataset
+## Dataset
 
 TMDB 5000 Movies Dataset
 
@@ -32,7 +32,7 @@ Files used:
 - tmdb_5000_movies.csv
 - tmdb_5000_credits.csv
 
-## 🧠 Recommendation Pipeline
+## Recommendation Pipeline
 
 1. Data Cleaning
 2. Feature Engineering
@@ -42,7 +42,7 @@ Files used:
 6. Genre Filtering
 7. Ranking Recommendations
 
-## 📸 Features
+##  Features
 
 - Similar movie recommendations
 - Poster previews
@@ -50,7 +50,7 @@ Files used:
 - Movie details
 - Fuzzy title matching
 
-## ⚙️ Installation
+## Installation
 
 Clone repository
 
