@@ -8,9 +8,7 @@ import requests
 import os
 
 
-load_dotenv()
-API_KEY=os.getenv("API_KEY")
-
+API_KEY = st.secrets["API_KEY"]
 movies=pickle.load(open("movies.pkl","rb"))
 
 #Vectorization
