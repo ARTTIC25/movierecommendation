@@ -33,7 +33,7 @@ def recommend(movie):
 
   if len(match_movie)==0:
     #print("NO such movie found")
-    return [],[],[]
+    return [],[],[],[],[],[]
   movie_index=movies[movies["title"].str.lower()==match_movie[0]].index[0]
   distance=list(enumerate(similarity[movie_index]))
   movie_list=sorted(distance,reverse=True,key=lambda x:x[1])[1:15]
@@ -62,7 +62,55 @@ def recommend(movie):
       if len(recommended_movie)==5:
          break
   return (recommended_movie,recommended_posters,recommended_rating,recommended_overview,recommended_release_date,similarity_score)
+st.set_page_config(
+    page_title="Movie Recommendation System",
+    layout="wide"
+)
 
+st.markdown("""
+<style>
+
+body {
+    background-color: #0E1117;
+}
+
+.main {
+    background-color: #0E1117;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""<style>
+            .movie-card{
+            background:#1c1c1c;
+            padding:15px;
+            border-radius:15px;
+            margin-top:-5px;
+            min-height:180px;
+            
+            }
+            .movie-card:hover{
+               transform:scale(1.05);
+               box-shadow: 0px 0px 15px rgba(255,255,255,0.3);
+            }
+            </style>""", unsafe_allow_html=True)
+            
+st.markdown("""<style>
+            img {
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+img:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 20px rgba(255,255,255,0.25);
+}</style>""",unsafe_allow_html=True)
 
 st.title("Movie Recommendation System")
 
@@ -81,17 +129,24 @@ if st.button("Recommend"):
             st.warning("No movie found")
 
         else:
-            col=st.columns(len(name))
+            col=st.columns(5)
+            st.caption("Your top recommedation")
             for i in range(len(name)):
                with col[i]:
-                  st.image(poster[i])
-                  st.subheader(name[i])
-                  st.caption(f"⭐ {rating[i]}")
-                  st.caption(f"📅 {date[i]}")
-                  st.caption(f"🎯 {score[i]}% Match")
-                  st.write(overview[i][:120] + "...")
+                  st.image(poster[i], use_container_width=True)
+                  st.markdown(f"""
+                              
+                              <div class="movie-card">
+                              <h3>{name[i]}</h3>
+                              <p> {score[i]}% Match</p>
+                              <p>Rating :{rating[i]}</p>
+                              <p>Rel_date:{date[i]}</p>
+                              </div>
+                              """, unsafe_allow_html=True)
             
 st.caption("Movie provided by TMDB")
+st.caption("This project  is just made for educational purpose only")
+st.caption("Made by Amith P Anil (Data Science 2nd year Btech student)")
             
 
-            
+#st.markdown("""<><>""",unsafe_allow_html=True)
