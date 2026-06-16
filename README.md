@@ -110,3 +110,6 @@ B.Tech Data Science Student
 ## Disclaimer
 This project was created for educational and learning purposes.
 Movie data and poster assets are provided by TMDB.
+
+## Link of the app
+https://movierecommendation-mjj3ospszbaddd4pwt2srs.streamlit.app
