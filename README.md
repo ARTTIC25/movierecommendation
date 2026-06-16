@@ -55,5 +55,5 @@ Files used:
 Clone repository
 
 ```bash
-git clone <your_repo_url>
+git clone <https://github.com/ARTTIC25/movierecommendation.git>
 cd movierecommendation
