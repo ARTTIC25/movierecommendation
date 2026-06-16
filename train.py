@@ -109,4 +109,4 @@ similarity=cosine_similarity(vectors)
 #print(similarity.shape)
 
 pickle.dump(movies,open("movies.pkl","wb"))
-pickle.dump(similarity,open("similarity.pkl","wb"))
+

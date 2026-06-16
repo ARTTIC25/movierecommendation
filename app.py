@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 from difflib import get_close_matches
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import pickle
 import streamlit as st
 import requests
@@ -10,7 +12,14 @@ load_dotenv()
 API_KEY=os.getenv("API_KEY")
 
 movies=pickle.load(open("movies.pkl","rb"))
-similarity=pickle.load(open("similarity.pkl","rb"))
+
+#Vectorization
+tfidf = TfidfVectorizer(
+    max_features=5000,
+    stop_words="english"
+)
+
+vectors = tfidf.fit_transform(movies["tag"])
 
 def fetch_poster(movie_id):
    url=f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}&language=en-US"
@@ -34,8 +43,10 @@ def recommend(movie):
   if len(match_movie)==0:
     #print("NO such movie found")
     return [],[],[],[],[],[]
-  movie_index=movies[movies["title"].str.lower()==match_movie[0]].index[0]
-  distance=list(enumerate(similarity[movie_index]))
+  movie_index = movies[movies["title"].str.lower() == match_movie[0]].index[0]
+  movie_vector = vectors[movie_index]
+  similarity_scores = cosine_similarity(movie_vector,vectors).flatten()
+  distance = list(enumerate(similarity_scores))
   movie_list=sorted(distance,reverse=True,key=lambda x:x[1])[1:15]
   orginal_genre=movies.iloc[movie_index].genres
   similarity_score=[]
