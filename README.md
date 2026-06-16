@@ -53,7 +53,7 @@ Files used:
 Clone the repository:
 
 bash
-git clone <repository-url>
+git https://github.com/ARTTIC25/movierecommendation.git
 cd movierecommendation
 
 Install dependencies:
